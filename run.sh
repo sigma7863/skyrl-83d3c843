@@ -68,7 +68,7 @@ echo "[serve] starting vLLM server..."
 python -m vllm.entrypoints.openai.api_server \
   --model "$REPRO_MODEL" \
   --port 8000 \
-  --max-model-len 8192 \
+  --max-model-len 16384 \
   --gpu-memory-utilization 0.85 \
   --disable-log-requests \
   > .openresearch/artifacts/vllm_server.log 2>&1 &

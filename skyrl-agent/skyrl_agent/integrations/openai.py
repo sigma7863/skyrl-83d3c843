@@ -68,6 +68,12 @@ class OpenAIBackend(AsyncInferBackend):
             output = await session.post(f"{self.api_url}/v1/completions", json=payload, headers=headers)
             output = await output.json()
 
+        if "choices" not in output:
+            # Surface API errors (e.g. context-length overflow) instead of a
+            # cryptic KeyError on `choices` deep in the agent loop.
+            logger.error(f"Completions API returned no choices: {output}")
+            raise RuntimeError(f"Completions API error: {output}")
+
         choice = output["choices"][0]
         text = choice["text"]
 
