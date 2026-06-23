@@ -29,7 +29,9 @@ echo "==================================================================="
 #    math/finish/openai inference path needs.
 # ---------------------------------------------------------------------------
 VENV=.repro_venv
-uv venv --python 3.12 "$VENV"
+# --seed installs pip into the venv so we can use plain `python -m pip` below
+# (uv venv omits pip by default).
+uv venv --seed --python 3.12 "$VENV"
 # shellcheck disable=SC1091
 source "$VENV/bin/activate"
 
