@@ -34,16 +34,22 @@ uv venv --python 3.12 "$VENV"
 source "$VENV/bin/activate"
 
 echo "[setup] installing vLLM + inference deps (this can take a few minutes)..."
+# IMPORTANT: this repo's root pyproject.toml / uv.lock pin
+# transformers>=5.6.1,<=5.8.0 for the SkyRL training stack. `uv pip install`
+# run inside the repo treats that as a workspace constraint and overrides any
+# transformers we ask for (forcing 5.8.0), which breaks vLLM. We install our
+# isolated inference env with plain pip from a neutral directory so the repo's
+# workspace pins do not leak in.
+#
 # vLLM 0.9.2 needs transformers>=4.51.1 but breaks on transformers 5.x (config
-# registry collisions, e.g. 'aimv2'). With no exact pin, uv grabs the latest
-# (5.x) and the server fails to import. Pin an exact, vLLM-0.9.2-compatible
-# transformers (verified to co-resolve with vllm==0.9.2).
-uv pip install -q \
-  "vllm==0.9.2" \
-  "transformers==4.53.2" \
-  "datasets" "omegaconf" "aiohttp" "loguru" \
-  "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
-  "pyarrow" "json5" "retry" "codetiming" "hf_transfer"
+# registry collisions, e.g. 'aimv2'); pin an exact 0.9.2-compatible version.
+( cd /tmp && python -m pip install -q --upgrade pip )
+( cd /tmp && python -m pip install -q \
+    "vllm==0.9.2" \
+    "transformers==4.53.2" \
+    "datasets" "omegaconf" "aiohttp" "loguru" \
+    "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
+    "pyarrow" "json5" "retry" "codetiming" "hf_transfer" )
 
 python - <<'PY'
 import transformers, vllm
