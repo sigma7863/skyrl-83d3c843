@@ -34,9 +34,13 @@ uv venv --python 3.12 "$VENV"
 source "$VENV/bin/activate"
 
 echo "[setup] installing vLLM + inference deps (this can take a few minutes)..."
+# vLLM 0.6.6.post1 requires transformers<4.48 (it relies on
+# tokenizer.all_special_tokens_extended, removed in newer transformers). Pin a
+# compatible transformers and let vLLM's own pins stand.
 uv pip install -q \
   "vllm==0.6.6.post1" \
-  "transformers" "datasets" "omegaconf" "aiohttp" "loguru" \
+  "transformers==4.47.1" \
+  "datasets" "omegaconf" "aiohttp" "loguru" \
   "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
   "pyarrow" "json5" "retry" "codetiming" "hf_transfer"
 
