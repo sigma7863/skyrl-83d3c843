@@ -1,0 +1,28 @@
+{
+  "rewards": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "rollout_metrics": {
+    "rollout_metrics/avg_turn_assistant": 1.0,
+    "rollout_metrics/num_all_resolved": 8,
+    "rollout_metrics/num_none_resolved": 0,
+    "rollout_metrics/finish_tool_ratio": 1.0,
+    "rollout_metrics/context_exceed_ratio": 0.0,
+    "rollout_metrics/iter_cap_ratio": 0.0,
+    "rollout_metrics/stuck_in_a_loop_ratio": 0.0,
+    "rollout_metrics/error_runtime": 0.0,
+    "rollout_metrics/error_evaluation": 0.0,
+    "rollout_metrics/num_mask_out": 0,
+    "rollout_metrics/num_mask_non_zero_reward": 0,
+    "rollout_metrics/bad_llm_response": 0.0,
+    "rollout_metrics/raw_reward": 1.0,
+    "rollout_metrics/num_empty_messages": 0
+  }
+}

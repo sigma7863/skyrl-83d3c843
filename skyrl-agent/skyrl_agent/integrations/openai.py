@@ -18,8 +18,9 @@ class OpenAIBackendConfig(TypedDict):
 
 
 class OpenAIBackend(AsyncInferBackend):
-    def __init__(self, infer_engine: Any, cfg: OpenAIBackendConfig):
+    def __init__(self, infer_engine: Any, cfg: OpenAIBackendConfig, tokenizer: Any = None):
         assert os.environ.get("OPENAI_API_KEY") is not None, "OPENAI_API_KEY is not set"
+        self.tokenizer = tokenizer
         self.model_name = cfg["model_name"]
         self.api_url = cfg["api_url"]
         try:
@@ -67,13 +68,27 @@ class OpenAIBackend(AsyncInferBackend):
             output = await session.post(f"{self.api_url}/v1/completions", json=payload, headers=headers)
             output = await output.json()
 
+        choice = output["choices"][0]
+        text = choice["text"]
+
+        # Tokenize the generated text so transitions carry real token ids
+        # (the transition-based backend bridge needs output_tokens to build
+        # training data; the raw OpenAI-compatible response does not return them).
+        output_tokens = None
+        if self.tokenizer is not None:
+            try:
+                output_tokens = self.tokenizer.encode(text, add_special_tokens=False)
+            except Exception as e:
+                logger.info(f"Failed to tokenize completion text: {e}")
+                output_tokens = []
+
         meta_info = {
-            "output_tokens": None,
-            "finish_reason": output["choices"][0]["finish_reason"],
+            "output_tokens": output_tokens,
+            "finish_reason": choice["finish_reason"],
             "logprobs": None,
         }
 
-        return output["choices"][0]["text"], meta_info
+        return text, meta_info
 
 
 class OpenAIGeneratorOutput(GeneratorOutput):
