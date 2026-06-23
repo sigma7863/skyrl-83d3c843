@@ -34,11 +34,13 @@ uv venv --python 3.12 "$VENV"
 source "$VENV/bin/activate"
 
 echo "[setup] installing vLLM + inference deps (this can take a few minutes)..."
-# Use a modern vLLM (0.9.2) that supports current transformers, avoiding the
-# tokenizer-API breakage of the old 0.6.x line. Let vLLM pull its own
-# compatible transformers; the agent-side tokenizer usage works on it too.
+# vLLM 0.9.2 needs transformers>=4.51.1 but breaks on transformers 5.x (config
+# registry collisions, e.g. 'aimv2'). With no exact pin, uv grabs the latest
+# (5.x) and the server fails to import. Pin an exact, vLLM-0.9.2-compatible
+# transformers (verified to co-resolve with vllm==0.9.2).
 uv pip install -q \
   "vllm==0.9.2" \
+  "transformers==4.53.2" \
   "datasets" "omegaconf" "aiohttp" "loguru" \
   "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
   "pyarrow" "json5" "retry" "codetiming" "hf_transfer"
@@ -46,6 +48,9 @@ uv pip install -q \
 python - <<'PY'
 import transformers, vllm
 print(f"[setup] vllm={vllm.__version__} transformers={transformers.__version__}")
+assert transformers.__version__.startswith("4.53"), (
+    f"Expected transformers 4.53.x for vLLM 0.9.2, got {transformers.__version__}"
+)
 PY
 
 # ---------------------------------------------------------------------------
