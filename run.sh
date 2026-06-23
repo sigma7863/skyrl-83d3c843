@@ -34,24 +34,18 @@ uv venv --python 3.12 "$VENV"
 source "$VENV/bin/activate"
 
 echo "[setup] installing vLLM + inference deps (this can take a few minutes)..."
-# vLLM 0.6.6.post1 relies on tokenizer.all_special_tokens_extended, removed in
-# transformers>=4.48, and its own pin has no upper bound (so an unconstrained
-# resolve grabs transformers 5.x and breaks). Constrain transformers with an
-# explicit upper bound so uv keeps a compatible version from the start.
+# Use a modern vLLM (0.9.2) that supports current transformers, avoiding the
+# tokenizer-API breakage of the old 0.6.x line. Let vLLM pull its own
+# compatible transformers; the agent-side tokenizer usage works on it too.
 uv pip install -q \
-  "vllm==0.6.6.post1" \
-  "transformers>=4.45.2,<4.48" \
+  "vllm==0.9.2" \
   "datasets" "omegaconf" "aiohttp" "loguru" \
   "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
   "pyarrow" "json5" "retry" "codetiming" "hf_transfer"
 
 python - <<'PY'
-import transformers
-print(f"[setup] transformers version in use: {transformers.__version__}")
-major, minor = transformers.__version__.split(".")[:2]
-assert (int(major), int(minor)) < (4, 48), (
-    f"Expected transformers <4.48 for vLLM 0.6.6.post1, got {transformers.__version__}"
-)
+import transformers, vllm
+print(f"[setup] vllm={vllm.__version__} transformers={transformers.__version__}")
 PY
 
 # ---------------------------------------------------------------------------
