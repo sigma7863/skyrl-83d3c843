@@ -34,15 +34,25 @@ uv venv --python 3.12 "$VENV"
 source "$VENV/bin/activate"
 
 echo "[setup] installing vLLM + inference deps (this can take a few minutes)..."
-# vLLM 0.6.6.post1 requires transformers<4.48 (it relies on
-# tokenizer.all_special_tokens_extended, removed in newer transformers). Pin a
-# compatible transformers and let vLLM's own pins stand.
 uv pip install -q \
   "vllm==0.6.6.post1" \
-  "transformers==4.47.1" \
   "datasets" "omegaconf" "aiohttp" "loguru" \
   "pandas" "numpy" "sympy" "pylatexenc" "litellm" "math_verify" \
   "pyarrow" "json5" "retry" "codetiming" "hf_transfer"
+
+# vLLM 0.6.6.post1 relies on tokenizer.all_special_tokens_extended, which was
+# removed in transformers>=4.48. Other deps (litellm, math_verify) may have
+# pulled a newer transformers during resolution, so force the compatible
+# version back in as the final, authoritative step and verify it.
+echo "[setup] pinning transformers to a vLLM-compatible version..."
+uv pip install -q --reinstall-package transformers "transformers==4.47.1"
+python - <<'PY'
+import transformers
+print(f"[setup] transformers version in use: {transformers.__version__}")
+assert transformers.__version__.startswith("4.47"), (
+    f"Expected transformers 4.47.x for vLLM 0.6.6.post1, got {transformers.__version__}"
+)
+PY
 
 # ---------------------------------------------------------------------------
 # 2. Launch the vLLM OpenAI-compatible server in the background.
