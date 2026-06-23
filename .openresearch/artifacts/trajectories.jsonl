@@ -1,8 +1,0 @@
-{"index": 0, "question": "What is 17 + 25? Give the final numeric answer.", "ground_truth": "42", "reward": 1.0, "correct": true}
-{"index": 1, "question": "What is 12 * 12? Give the final numeric answer.", "ground_truth": "144", "reward": 1.0, "correct": true}
-{"index": 2, "question": "A train travels 60 miles in 1.5 hours. What is its average speed in mph?", "ground_truth": "40", "reward": 1.0, "correct": true}
-{"index": 3, "question": "What is the value of 100 - 37? Give the final numeric answer.", "ground_truth": "63", "reward": 1.0, "correct": true}
-{"index": 4, "question": "If a dozen eggs costs $3, how much do 4 dozen eggs cost in dollars?", "ground_truth": "12", "reward": 1.0, "correct": true}
-{"index": 5, "question": "What is 7 squared? Give the final numeric answer.", "ground_truth": "49", "reward": 1.0, "correct": true}
-{"index": 6, "question": "What is the sum of the first 5 positive integers?", "ground_truth": "15", "reward": 1.0, "correct": true}
-{"index": 7, "question": "What is 144 divided by 12? Give the final numeric answer.", "ground_truth": "12", "reward": 1.0, "correct": true}
